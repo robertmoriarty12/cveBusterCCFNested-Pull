@@ -1,0 +1,103 @@
+[
+  {
+    "type": "Microsoft.SecurityInsights/dataConnectors",
+    "apiVersion": "2022-10-01-preview",
+    "name": "cveBusterNestedAPIPoller",
+    "kind": "RestApiPoller",
+    "properties": {
+      "connectorDefinitionName": "cveBusterNestedAPIConnector",
+      "dataType": "cveBusterNestedVulnerabilities_CL",
+      "dcrConfig": {
+        "streamName": "Custom-cveBusterNestedVulnerabilitiesStream",
+        "dataCollectionEndpoint": "[[parameters('dcrConfig').dataCollectionEndpoint]",
+        "dataCollectionRuleImmutableId": "[[parameters('dcrConfig').dataCollectionRuleImmutableId]"
+      },
+      "auth": {
+        "type": "APIKey",
+        "ApiKey": "[[parameters('apiKey')]",
+        "ApiKeyName": "Authorization"
+      },
+      "request": {
+        "apiEndpoint": "[[concat(parameters('apiEndpoint'), '/api/vulnerabilities/ids')]",
+        "rateLimitQPS": 10,
+        "queryWindowInMin": 5,
+        "httpMethod": "GET",
+        "queryTimeFormat": "yyyy-MM-ddTHH:mm:ssZ",
+        "startTimeAttributeName": "startTime",
+        "endTimeAttributeName": "endTime",
+        "retryCount": 3,
+        "timeoutInSeconds": 60,
+        "headers": {
+          "Accept": "application/json",
+          "User-Agent": "cveBuster-Sentinel-Connector-NestedAPI/3.0"
+        }
+      },
+      "response": {
+        "eventsJsonPaths": [
+          "$"
+        ],
+        "format": "json"
+      },
+      "stepInfo": {
+        "stepType": "Nested",
+        "nextSteps": [
+          {
+            "stepId": "step1_vulnerability_details",
+            "stepPlaceholdersParsingKql": "source | project res = parse_json(data) | project ids = res['vulnerability_ids'] | mvexpand ids | project Url_PlaceHolder = ids"
+          }
+        ]
+      },
+      "stepCollectorConfigs": {
+        "step1_vulnerability_details": {
+          "shouldJoinNestedData": true,
+          "joinedDataStepName": "vulnerability",
+          "request": {
+            "httpMethod": "GET",
+            "apiEndpoint": "[[concat(parameters('apiEndpoint'), '/api/vulnerabilities/$Url_PlaceHolder$')]",
+            "retryCount": 3,
+            "timeoutInSeconds": 60,
+            "headers": {
+              "Accept": "application/json",
+              "User-Agent": "cveBuster-Sentinel-Connector-NestedAPI/3.0"
+            }
+          },
+          "response": {
+            "eventsJsonPaths": [
+              "$"
+            ],
+            "format": "json"
+          },
+          "stepInfo": {
+            "stepType": "Nested",
+            "nextSteps": [
+              {
+                "stepId": "step2_asset_details",
+                "stepPlaceholdersParsingKql": "source | project res = parse_json(data) | project assets = res['affected_assets'] | mvexpand assets | project Asset_PlaceHolder = assets"
+              }
+            ]
+          }
+        },
+        "step2_asset_details": {
+          "shouldJoinNestedData": true,
+          "joinedDataStepName": "assets",
+          "request": {
+            "httpMethod": "GET",
+            "apiEndpoint": "[[concat(parameters('apiEndpoint'), '/api/assets/$Asset_PlaceHolder$')]",
+            "retryCount": 3,
+            "timeoutInSeconds": 60,
+            "headers": {
+              "Accept": "application/json",
+              "User-Agent": "cveBuster-Sentinel-Connector-NestedAPI/3.0"
+            }
+          },
+          "response": {
+            "eventsJsonPaths": [
+              "$"
+            ],
+            "format": "json"
+          }
+        }
+      }
+    }
+  }
+]

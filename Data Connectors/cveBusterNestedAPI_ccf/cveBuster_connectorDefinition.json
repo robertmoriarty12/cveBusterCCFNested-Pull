@@ -1,0 +1,102 @@
+{
+  "id": "cveBusterNestedAPIConnector",
+  "title": "cveBuster Nested API (Preview)",
+  "publisher": "Microsoft Security CxE",
+  "descriptionMarkdown": "The cveBuster Nested API connector demonstrates Sentinel CCF's nested API capabilities. This connector showcases multi-level API calls with data joining, mimicking real-world ISV patterns from CrowdStrike, TrendMicro, SecurityScorecard, and BigID. \n\n**Key Features:**\n- 3-level nested API calls (IDs → Details → Assets)\n- Data joining using `shouldJoinNestedData`\n- KQL-based placeholder extraction\n- Fan-out pattern support (1 vulnerability → many assets)",
+  "graphQueries": [
+    {
+      "metricName": "Total vulnerabilities ingested",
+      "legend": "cveBusterNestedVulnerabilities_CL",
+      "baseQuery": "cveBusterNestedVulnerabilities_CL"
+    }
+  ],
+  "sampleQueries": [
+    {
+      "description": "All vulnerabilities with joined asset data",
+      "query": "cveBusterNestedVulnerabilities_CL\n| extend vuln = parse_json(vulnerability_details)\n| extend vuln_id = tostring(vuln.vuln_id)\n| extend severity = tostring(vuln.severity)\n| extend cvss = toreal(vuln.cvss)\n| extend affected_assets = parse_json(assets)\n| mv-expand affected_assets\n| extend asset_name = tostring(affected_assets.asset_name)\n| extend os_version = tostring(affected_assets.os_version)\n| project TimeGenerated, vuln_id, severity, cvss, asset_name, os_version"
+    },
+    {
+      "description": "Critical vulnerabilities on unpatched systems",
+      "query": "cveBusterNestedVulnerabilities_CL\n| extend vuln = parse_json(vulnerability_details)\n| extend severity = tostring(vuln.severity)\n| extend cvss = toreal(vuln.cvss)\n| where severity == 'Critical'\n| extend affected_assets = parse_json(assets)\n| mv-expand affected_assets\n| extend patch_status = tostring(affected_assets.patch_status)\n| where patch_status contains 'Missing'\n| project TimeGenerated, tostring(vuln.vuln_id), cvss, tostring(affected_assets.asset_name), patch_status"
+    }
+  ],
+  "dataTypes": [
+    {
+      "name": "cveBusterNestedVulnerabilities_CL",
+      "lastDataReceivedQuery": "cveBusterNestedVulnerabilities_CL\n| summarize Time = max(TimeGenerated)\n| where isnotempty(Time)"
+    }
+  ],
+  "connectivityCriterias": [
+    {
+      "type": "IsConnectedQuery",
+      "value": [
+        "cveBusterNestedVulnerabilities_CL\n| summarize LastLogReceived = max(TimeGenerated)\n| project IsConnected = LastLogReceived > ago(30d)"
+      ]
+    }
+  ],
+  "availability": {
+    "status": 1,
+    "isPreview": true
+  },
+  "permissions": {
+    "resourceProvider": [
+      {
+        "provider": "Microsoft.OperationalInsights/workspaces",
+        "permissionsDisplayText": "read and write permissions are required.",
+        "providerDisplayName": "Workspace",
+        "scope": "Workspace",
+        "requiredPermissions": {
+          "write": true,
+          "read": true,
+          "delete": true
+        }
+      },
+      {
+        "provider": "Microsoft.OperationalInsights/workspaces/sharedKeys",
+        "permissionsDisplayText": "read permissions to shared keys for the workspace are required. [See the documentation to learn more about workspace keys](https://docs.microsoft.com/azure/azure-monitor/platform/agent-windows#obtain-workspace-id-and-key).",
+        "providerDisplayName": "Keys",
+        "scope": "Workspace",
+        "requiredPermissions": {
+          "action": true
+        }
+      }
+    ]
+  },
+  "instructionSteps": [
+    {
+      "title": "1. Configure cveBuster Nested API Server",
+      "description": "Deploy the mock API server or configure your production cveBuster API endpoint. Ensure the following endpoints are available:\n- `GET /api/vulnerabilities/ids` (Step 0: Root call)\n- `GET /api/vulnerabilities/{vuln_id}` (Step 1: Details)\n- `GET /api/assets/{asset_name}` (Step 2: Asset enrichment)",
+      "instructions": [
+        {
+          "parameters": {
+            "fillWith": [
+              "apiEndpoint"
+            ],
+            "label": "API Base Endpoint (e.g., http://your-server:5000)"
+          },
+          "type": "CopyableLabel"
+        }
+      ]
+    },
+    {
+      "title": "2. Provide API Key",
+      "description": "Enter the API key for authentication. This will be sent in the `Authorization` header.",
+      "instructions": [
+        {
+          "parameters": {
+            "fillWith": [
+              "apiKey"
+            ],
+            "label": "API Key"
+          },
+          "type": "CopyableLabel"
+        }
+      ]
+    },
+    {
+      "title": "3. Understanding Nested API Flow",
+      "description": "This connector demonstrates a 3-level nested API pattern:\n\n**Step 0 (Root):** Fetches list of vulnerability IDs filtered by time\n**Step 1 (Nested):** For each ID, fetches full vulnerability details\n**Step 2 (Nested):** For each affected asset in the vulnerability, fetches asset details\n\nAll data is joined and sent to Sentinel as a single record per vulnerability with embedded asset array.",
+      "instructions": []
+    }
+  ]
+}

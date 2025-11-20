@@ -1,0 +1,22 @@
+{
+  "Name": "cveBuster Nested API Testing Solution",
+  "Author": "Microsoft Security CxE ISV Team",
+  "Logo": "<img src=\"https://github.com/Azure/Azure-Sentinel/raw/master/Logos/Azure_Sentinel.svg\" width=\"75px\" height=\"75px\">",
+  "Description": "A comprehensive testing solution demonstrating Sentinel CCF nested API capabilities with multi-level calls and data joining. Validates real-world ISV patterns from CrowdStrike, TrendMicro, SecurityScorecard, and BigID.",
+  "Data Connectors": [
+    "Data Connectors/cveBusterNestedAPI_ccf/cveBuster_connectorDefinition.json",
+    "Data Connectors/cveBusterNestedAPI_ccf/cveBuster_PollerConfig.json"
+  ],
+  "Parsers": [],
+  "Workbooks": [],
+  "Analytic Rules": [],
+  "Hunting Queries": [],
+  "Watchlists": [],
+  "Playbooks": [],
+  "CustomConnector": [],
+  "BasePath": "C:\\GitHub\\Azure-Sentinel\\Solutions\\cveBusterNestedAPI",
+  "Version": "3.0.0",
+  "Metadata": "SolutionMetadata.json",
+  "TemplateSpec": true,
+  "Is1PConnector": false
+}

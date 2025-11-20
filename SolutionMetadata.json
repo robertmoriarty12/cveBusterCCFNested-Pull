@@ -1,0 +1,26 @@
+{
+  "publisherId": "azuresentinel",
+  "offerId": "azure-sentinel-solution-cvebuster-nestedapi",
+  "firstPublishDate": "2025-01-15",
+  "providers": ["Microsoft"],
+  "categories": {
+    "domains": ["Security - Threat Protection", "Security - Vulnerability Management"],
+    "verticals": []
+  },
+  "support": {
+    "tier": "Community",
+    "name": "Microsoft Security CxE",
+    "link": "https://github.com/Azure/Azure-Sentinel/issues"
+  },
+  "version": "3.0.0",
+  "icon": "<img src=\"https://github.com/Azure/Azure-Sentinel/raw/master/Logos/Azure_Sentinel.svg\" width=\"75px\" height=\"75px\">",
+  "description": "**Note**: This is a testing/validation solution and not intended for production use.\n\nThe cveBuster Nested API solution demonstrates Microsoft Sentinel's Codeless Connector Framework (CCF) nested API capabilities. This solution validates multi-level API call patterns and data joining features required by ISV partners.\n\n**Testing Scenarios:**\n- 3-level nested API calls (IDs → Details → Enrichment)\n- Data joining with `shouldJoinNestedData`\n- KQL-based placeholder extraction\n- Fan-out patterns (1 record → many nested calls)\n- Time-based filtering across nested levels\n\n**Validated ISV Patterns:**\n- CrowdStrike: Detection IDs → Detection details → Device context\n- TrendMicro: Incident IDs → Incident details → Endpoint/user context\n- SecurityScorecard: Portfolios → Companies → Ratings/factors\n- BigID: Cases → Affected objects → Data source details\n\nThis solution includes a complete mock API server for local testing and validation.",
+  "contentProductId": "cvebuster-nestedapi-solution",
+  "contentId": "cveBusterNestedAPIContent",
+  "contentKind": "Solution",
+  "contentSchemaVersion": "3.0.0",
+  "packageKind": "Solution",
+  "packageVersion": "3.0.0",
+  "packageName": "cveBuster Nested API Testing",
+  "packageId": "cvebuster-nestedapi-package"
+}

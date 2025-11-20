@@ -1,0 +1,84 @@
+{
+  "properties": {
+    "schema": {
+      "name": "cveBusterNestedVulnerabilities_CL",
+      "columns": [
+        {
+          "name": "TimeGenerated",
+          "type": "datetime",
+          "description": "The timestamp when the record was generated"
+        },
+        {
+          "name": "vulnerability_id",
+          "type": "string",
+          "description": "CVE identifier (e.g., CVE-2024-10001)"
+        },
+        {
+          "name": "vulnerability_severity",
+          "type": "string",
+          "description": "Severity level: Critical, High, Medium, Low"
+        },
+        {
+          "name": "vulnerability_cvss",
+          "type": "real",
+          "description": "CVSS score (0.0 - 10.0)"
+        },
+        {
+          "name": "vulnerability_title",
+          "type": "string",
+          "description": "Short description of the vulnerability"
+        },
+        {
+          "name": "vulnerability_type",
+          "type": "string",
+          "description": "Type of vulnerability (e.g., Remote Code Execution)"
+        },
+        {
+          "name": "vulnerability_status",
+          "type": "string",
+          "description": "Current status: Open, In Progress, Patched, Mitigated, Risk Accepted"
+        },
+        {
+          "name": "patch_available",
+          "type": "boolean",
+          "description": "Whether a patch is available"
+        },
+        {
+          "name": "exploit_available",
+          "type": "boolean",
+          "description": "Whether an exploit is available"
+        },
+        {
+          "name": "exploit_public",
+          "type": "boolean",
+          "description": "Whether the exploit is publicly available"
+        },
+        {
+          "name": "discovery_date",
+          "type": "datetime",
+          "description": "When the vulnerability was first discovered"
+        },
+        {
+          "name": "last_modified",
+          "type": "datetime",
+          "description": "When the vulnerability record was last modified"
+        },
+        {
+          "name": "vulnerability_details",
+          "type": "dynamic",
+          "description": "Full vulnerability object from Step 1 (nested data)"
+        },
+        {
+          "name": "assets",
+          "type": "dynamic",
+          "description": "Array of affected asset objects from Step 2 (nested data). Use mv-expand in queries to flatten."
+        },
+        {
+          "name": "total_affected_assets",
+          "type": "int",
+          "description": "Number of assets affected by this vulnerability"
+        }
+      ]
+    }
+  }
+}

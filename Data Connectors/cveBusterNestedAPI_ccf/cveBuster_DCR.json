@@ -1,0 +1,91 @@
+{
+  "properties": {
+    "dataCollectionEndpointId": "[[parameters('dataCollectionEndpointId')]",
+    "streamDeclarations": {
+      "Custom-cveBusterNestedVulnerabilitiesStream": {
+        "columns": [
+          {
+            "name": "TimeGenerated",
+            "type": "datetime"
+          },
+          {
+            "name": "vulnerability_id",
+            "type": "string"
+          },
+          {
+            "name": "vulnerability_severity",
+            "type": "string"
+          },
+          {
+            "name": "vulnerability_cvss",
+            "type": "real"
+          },
+          {
+            "name": "vulnerability_title",
+            "type": "string"
+          },
+          {
+            "name": "vulnerability_type",
+            "type": "string"
+          },
+          {
+            "name": "vulnerability_status",
+            "type": "string"
+          },
+          {
+            "name": "patch_available",
+            "type": "boolean"
+          },
+          {
+            "name": "exploit_available",
+            "type": "boolean"
+          },
+          {
+            "name": "exploit_public",
+            "type": "boolean"
+          },
+          {
+            "name": "discovery_date",
+            "type": "datetime"
+          },
+          {
+            "name": "last_modified",
+            "type": "datetime"
+          },
+          {
+            "name": "vulnerability_details",
+            "type": "dynamic"
+          },
+          {
+            "name": "assets",
+            "type": "dynamic"
+          },
+          {
+            "name": "total_affected_assets",
+            "type": "int"
+          }
+        ]
+      }
+    },
+    "destinations": {
+      "logAnalytics": [
+        {
+          "workspaceResourceId": "[[parameters('workspaceResourceId')]",
+          "name": "cveBusterNestedWorkspace"
+        }
+      ]
+    },
+    "dataFlows": [
+      {
+        "streams": [
+          "Custom-cveBusterNestedVulnerabilitiesStream"
+        ],
+        "destinations": [
+          "cveBusterNestedWorkspace"
+        ],
+        "transformKql": "source | extend TimeGenerated = now() | extend vulnerability_id = tostring(vulnerability.vuln_id) | extend vulnerability_severity = tostring(vulnerability.severity) | extend vulnerability_cvss = toreal(vulnerability.cvss) | extend vulnerability_title = tostring(vulnerability.vuln_title) | extend vulnerability_type = tostring(vulnerability.vuln_type) | extend vulnerability_status = tostring(vulnerability.status) | extend patch_available = tobool(vulnerability.patch_available) | extend exploit_available = tobool(vulnerability.exploit_available) | extend exploit_public = tobool(vulnerability.exploit_public) | extend discovery_date = todatetime(vulnerability.discovery_date) | extend last_modified = todatetime(vulnerability.last_modified) | extend vulnerability_details = vulnerability | extend assets = assets | extend total_affected_assets = array_length(assets) | project TimeGenerated, vulnerability_id, vulnerability_severity, vulnerability_cvss, vulnerability_title, vulnerability_type, vulnerability_status, patch_available, exploit_available, exploit_public, discovery_date, last_modified, vulnerability_details, assets, total_affected_assets",
+        "outputStream": "Custom-cveBusterNestedVulnerabilities_CL"
+      }
+    ]
+  }
+}
