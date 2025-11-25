@@ -1,6 +1,6 @@
 import json
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 def generate_assets(num_assets=30):
     """Generate mock asset (server) data."""
@@ -35,7 +35,7 @@ def generate_assets(num_assets=30):
             "ip_address": f"10.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(1, 254)}",
             "criticality": random.choice(criticalities),
             "patch_status": random.choice(patch_statuses),
-            "last_seen": (datetime.utcnow() - timedelta(hours=random.randint(0, 48))).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "last_seen": (datetime.now(timezone.utc) - timedelta(hours=random.randint(0, 48))).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "owner": f"Team-{random.choice(['Security', 'Infrastructure', 'Application', 'Database'])}",
             "location": random.choice(["US-East", "US-West", "EU-West", "APAC-Southeast"])
         }
@@ -62,7 +62,7 @@ def generate_vulnerabilities(assets, num_vulns=50):
         "Buffer Overflow"
     ]
     
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     vulnerabilities = []
     
     for i in range(1, num_vulns + 1):
