@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -41,15 +41,11 @@ def check_auth():
     return True
 
 def parse_iso_datetime(dt_str):
-    """Parse ISO 8601 datetime string to timezone-aware datetime object."""
+    """Parse ISO 8601 datetime string to datetime object."""
     try:
         if dt_str.endswith('Z'):
             dt_str = dt_str[:-1] + '+00:00'
-        dt = datetime.fromisoformat(dt_str)
-        # Ensure timezone-aware
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        return dt
+        return datetime.fromisoformat(dt_str)
     except Exception as e:
         print(f"⚠️  Error parsing datetime '{dt_str}': {e}")
         return None
@@ -253,10 +249,9 @@ def get_stats():
         return jsonify({"error": "Unauthorized"}), 401
     
     # Count recent vulnerabilities (last 5 minutes)
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     recent_vulns = [v for v in vulnerabilities 
-                    if parse_iso_datetime(v['last_modified']) and 
-                       (now - parse_iso_datetime(v['last_modified'])).total_seconds() < 300]
+                    if (now - parse_iso_datetime(v['last_modified'])).total_seconds() < 300]
     
     # Calculate total relationships
     total_relationships = sum(len(v['affected_assets']) for v in vulnerabilities)
